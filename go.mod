@@ -4,4 +4,7 @@ replace utils/demo v0.0.0 => ./utils/demo
 
 replace utils/uuid v0.0.0 => ./utils/uuid
 
-require utils/uuid v0.0.0
+require (
+	github.com/eiblog/utils v0.0.0-20180918123929-fcdc03d4d492
+	utils/uuid v0.0.0
+)
