@@ -12,26 +12,49 @@ var db = make(map[string]string)
 func setupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
-	r := gin.Default()
+	router := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World")
 	})
-	r.GET("/welcome", func(c *gin.Context) {
+
+	// 获取querystring参数
+	router.GET("/querystring", func(c *gin.Context) {
+
+		// 获取参数?name=abc,如果没有取默认值
 		name := c.DefaultQuery("name", "Guest") //可设置默认值
 		// 是 c.Request.URL.Query().Get("lastname") 的简写
-		// lastname := c.Query("lastname")
+
+		lastname := c.Query("lastname")
+		// ct := c.Header("Content-Type","text/html; charset=utf-8")
+
+		// 获取请求头
+		headVersion := c.GetHeader("version")
+		fmt.Printf("%T", headVersion)
+		// 设置响应头
+		c.Header("lastname", lastname)
 		c.String(http.StatusOK, name)
 		// fmt.Println("Hello %s", name)
 	})
+	// POST 传递参数
+	router.POST("post", func(c *gin.Context) {
+		// 获取url里面的参数
+		id := c.Query("id")
+		page := c.DefaultQuery("page", "0")
+		message := c.PostForm("message")
+		name := c.PostForm("name")
+		fmt.Printf("id: %s; page: %s; name: %s; message: %s", id, page, name, message)
+	})
 
 	// Ping test
-	r.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 
 	// Get user value
-	r.GET("/user/:name", func(c *gin.Context) {
+	// 带参数的路由
+	// 获取路由匹配的参数
+	router.GET("/user/:name", func(c *gin.Context) {
 		user := c.Params.ByName("name")
 		db["foo"] = "aaa"
 		value, ok := db[user]
@@ -51,7 +74,16 @@ func setupRouter() *gin.Engine {
 	//}))
 
 	// 路由群组
-	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
+	// Simple group: v1
+	v1 := router.Group("/v1")
+	{
+		v1.GET("/user", func(c *gin.Context) {
+			c.String(http.StatusOK, "user-v1")
+		})
+
+	}
+
+	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
 		"foo":  "bar", // user:foo password:bar
 		"manu": "123", // user:manu password:123
 	}))
@@ -79,7 +111,7 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
-	return r
+	return router
 }
 
 func main() {
