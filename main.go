@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	log "fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,20 +15,53 @@ func setupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	router := gin.Default()
+	router.Use(Logger())
 
 	//加载模板
-	router.LoadHTMLGlob("templates/*")
+	// router.LoadHTMLGlob("templates/*")
 	// router.LoadHTMLFiles("templates/index.tmpl", "templates/index.html", "templates/index2.html")
-
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello World")
-	})
-
-	router.GET("/index", func(c *gin.Context) {
+	/* router.GET("/index", func(c *gin.Context) {
 		//根据完整文件名渲染模板，并传递参数
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"title": "Hello,world",
 		})
+	}) */
+
+	router.LoadHTMLGlob("templates/**/*")
+	router.GET("/posts/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "posts/index.tmpl", gin.H{
+			"title": "Posts",
+		})
+	})
+	router.GET("/users/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "users/index.tmpl", gin.H{
+			"title": "Users",
+		})
+	})
+
+	router.GET("/json", func(c *gin.Context) {
+		// data := []int{1, 2, 3}
+		// c.JSON(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
+
+		var msg struct {
+			// 右边的tag用来映射返回结果中的key
+			Name    string `json:"user" xml:"user"`
+			Message string
+			Number  int
+		}
+		msg.Name = "Lena"
+		msg.Message = "hey"
+		msg.Number = 123
+		c.JSON(http.StatusOK, msg)
+	})
+
+	router.GET("/xml", func(c *gin.Context) {
+		data := []int{1, 2, 3}
+		c.XML(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
+	})
+
+	router.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "Hello World")
 	})
 
 	// Ping test
@@ -78,14 +113,6 @@ func setupRouter() *gin.Engine {
 		fmt.Printf("id: %s; page: %s; name: %s; message: %s", id, page, name, message)
 	})
 
-	// Authorized group (uses gin.BasicAuth() middleware)
-	// Same than:
-	// authorized := r.Group("/")
-	// authorized.Use(gin.BasicAuth(gin.Credentials{
-	//	  "foo":  "bar",
-	//	  "manu": "123",
-	//}))
-
 	// 路由群组
 	// Simple group: v1
 	v1 := router.Group("/v1")
@@ -99,6 +126,7 @@ func setupRouter() *gin.Engine {
 
 	}
 
+	// Authorized group (uses gin.BasicAuth() middleware)
 	authorized := router.Group("/admin", gin.BasicAuth(gin.Accounts{
 		"foo":  "bar", // user:foo password:bar
 		"manu": "123", // user:manu password:123
@@ -123,7 +151,7 @@ func setupRouter() *gin.Engine {
 			db[user] = json.Value
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 		} else {
-			fmt.Println(ok)
+			log.Println(ok)
 		}
 	})
 
@@ -134,7 +162,35 @@ func setupRouter() *gin.Engine {
 
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
+	router.GET("/301", func(c *gin.Context) {
+		//支持内部和外部的重定向
+		// c.Redirect(http.StatusMovedPermanently, "http://www.baidu.com/")
+		c.Redirect(http.StatusMovedPermanently, "/json")
+	})
+
 	return router
+}
+
+// Logger 中间件定义
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		t := time.Now()
+
+		// 在gin上下文中定义变量
+		c.Set("example", "12345")
+
+		// 请求前
+
+		c.Next() //处理请求
+
+		// 请求后
+		latency := time.Since(t)
+		log.Print(latency)
+
+		// access the status we are sending
+		status := c.Writer.Status()
+		log.Println(status)
+	}
 }
 
 func main() {
