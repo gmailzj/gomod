@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	guuid "github.com/google/uuid"
 )
+import "utils/uuid"
 
 var db = make(map[string]string)
 
@@ -17,49 +19,6 @@ func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(Logger())
 
-	//加载模板
-	// router.LoadHTMLGlob("templates/*")
-	// router.LoadHTMLFiles("templates/index.tmpl", "templates/index.html", "templates/index2.html")
-	/* router.GET("/index", func(c *gin.Context) {
-		//根据完整文件名渲染模板，并传递参数
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "Hello,world",
-		})
-	}) */
-
-	router.LoadHTMLGlob("templates/**/*")
-	router.GET("/posts/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "posts/index.tmpl", gin.H{
-			"title": "Posts",
-		})
-	})
-	router.GET("/users/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "users/index.tmpl", gin.H{
-			"title": "Users",
-		})
-	})
-
-	router.GET("/json", func(c *gin.Context) {
-		// data := []int{1, 2, 3}
-		// c.JSON(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
-
-		var msg struct {
-			// 右边的tag用来映射返回结果中的key
-			Name    string `json:"user" xml:"user"`
-			Message string
-			Number  int
-		}
-		msg.Name = "Lena"
-		msg.Message = "hey"
-		msg.Number = 123
-		c.JSON(http.StatusOK, msg)
-	})
-
-	router.GET("/xml", func(c *gin.Context) {
-		data := []int{1, 2, 3}
-		c.XML(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
-	})
-
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World")
 	})
@@ -67,6 +26,16 @@ func setupRouter() *gin.Engine {
 	// Ping test
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
+	})
+
+	router.GET("/uuid", func(c *gin.Context) {
+		// get a UUID instance
+		uuidMy := guuid.New()
+		str := uuidMy.String()
+
+		uuids := uuid.NewV4()
+		fmt.Print("version:", uuids.Version(), "\n")
+		c.String(http.StatusOK, str)
 	})
 
 	// Get user value
@@ -153,6 +122,49 @@ func setupRouter() *gin.Engine {
 		} else {
 			log.Println(ok)
 		}
+	})
+
+	//加载模板
+	// router.LoadHTMLGlob("templates/*")
+	// router.LoadHTMLFiles("templates/index.tmpl", "templates/index.html", "templates/index2.html")
+	/* router.GET("/index", func(c *gin.Context) {
+		//根据完整文件名渲染模板，并传递参数
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"title": "Hello,world",
+		})
+	}) */
+
+	router.LoadHTMLGlob("templates/**/*")
+	router.GET("/posts/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "posts/index.tmpl", gin.H{
+			"title": "Posts",
+		})
+	})
+	router.GET("/users/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "users/index.tmpl", gin.H{
+			"title": "Users",
+		})
+	})
+
+	router.GET("/json", func(c *gin.Context) {
+		// data := []int{1, 2, 3}
+		// c.JSON(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
+
+		var msg struct {
+			// 右边的tag用来映射返回结果中的key
+			Name    string `json:"user" xml:"user"`
+			Message string
+			Number  int
+		}
+		msg.Name = "Lena"
+		msg.Message = "hey"
+		msg.Number = 123
+		c.JSON(http.StatusOK, msg)
+	})
+
+	router.GET("/xml", func(c *gin.Context) {
+		data := []int{1, 2, 3}
+		c.XML(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
 	})
 
 	// 设置静态文件目录
