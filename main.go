@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	log "fmt"
 	"net/http"
@@ -8,10 +9,62 @@ import (
 
 	"github.com/gin-gonic/gin"
 	guuid "github.com/google/uuid"
+	_ "github.com/mattn/go-sqlite3"
 )
 import "utils/uuid"
 
-var db = make(map[string]string)
+var dbMap = make(map[string]string)
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+func initDb() {
+
+	db, err := sql.Open("sqlite3", "./db.db")
+	checkErr(err)
+	// //插入数据
+	// stmt, err := db.Prepare("INSERT INTO userinfo(username, department, created) values(?,?,?)")
+	// checkErr(err)
+
+	// res, err := stmt.Exec("astaxie", "研发部门", "2012-12-09")
+	// checkErr(err)
+
+	// id, err := res.LastInsertId()
+	// checkErr(err)
+	id := int64(2)
+	fmt.Println(id)
+	//更新数据
+	stmt, err := db.Prepare("update userinfo set username=? where uid=?")
+	checkErr(err)
+
+	res, err := stmt.Exec("astaxieupdate", id)
+	checkErr(err)
+
+	affect, err := res.RowsAffected()
+	checkErr(err)
+
+	fmt.Println(affect)
+
+	//查询数据
+	rows, err := db.Query("SELECT * FROM userinfo")
+	checkErr(err)
+
+	for rows.Next() {
+		var uid int
+		var username string
+		var department string
+		var created time.Time
+		err = rows.Scan(&uid, &username, &department, &created)
+		checkErr(err)
+		fmt.Println(uid)
+		fmt.Println(username)
+		fmt.Println(department)
+		fmt.Println(created)
+	}
+	defer stmt.Close() //关闭之
+}
 
 func setupRouter() *gin.Engine {
 	// Disable Console Color
@@ -45,8 +98,8 @@ func setupRouter() *gin.Engine {
 		// 下面两种方式都可以
 		user := c.Params.ByName("name")
 		user2 := c.Param("name")
-		db["foo"] = "aaa" + user2
-		value, ok := db[user]
+		dbMap["foo"] = "aaa" + user2
+		value, ok := dbMap[user]
 		if ok {
 			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
 		} else {
@@ -60,6 +113,7 @@ func setupRouter() *gin.Engine {
 		// 获取参数?name=abc,如果没有取默认值
 		name := c.DefaultQuery("name", "Guest") //可设置默认值
 		// 是 c.Request.URL.Query().Get("lastname") 的简写
+		fmt.Printf("%T", name)
 
 		lastname := c.Query("lastname")
 		// ct := c.Header("Content-Type","text/html; charset=utf-8")
@@ -117,7 +171,7 @@ func setupRouter() *gin.Engine {
 			}'
 		*/
 		if ok := c.Bind(&json); ok == nil {
-			db[user] = json.Value
+			dbMap[user] = json.Value
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 		} else {
 			log.Println(ok)
@@ -206,7 +260,8 @@ func Logger() gin.HandlerFunc {
 }
 
 func main() {
+	initDb()
 	r := setupRouter()
-	// Listen and Server in 0.0.0.0:8080
-	r.Run(":8080")
+	// Listen and Server in 0.0.0.0:8081
+	r.Run(":8081")
 }
