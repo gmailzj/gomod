@@ -164,6 +164,9 @@ func setupRouter() *gin.Engine {
 			//查询数据
 			rows, err := db.Query("SELECT * FROM userinfo")
 			checkErr(err)
+			data := gin.H{
+				"errCode": 0,
+			}
 
 			list := []gin.H{}
 			for rows.Next() {
@@ -180,7 +183,9 @@ func setupRouter() *gin.Engine {
 					"created":    created,
 				})
 			}
-			c.JSON(http.StatusOK, list)
+			data["list"] = list
+
+			c.JSON(http.StatusOK, data)
 		})
 		v1.GET("/list", func(c *gin.Context) {
 			c.String(http.StatusOK, "list-v1")
@@ -293,8 +298,8 @@ func Logger() gin.HandlerFunc {
 		log.Print(latency)
 
 		// access the status we are sending
-		status := c.Writer.Status()
-		log.Println(status)
+		// status := c.Writer.Status()
+		// log.Println(status)
 	}
 }
 
