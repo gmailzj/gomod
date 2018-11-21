@@ -63,6 +63,18 @@ func initDb() {
 		fmt.Println(department)
 		fmt.Println(created)
 	}
+	//删除数据
+	// stmt, err = db.Prepare("delete from userinfo where uid=?")
+	// checkErr(err)
+
+	// res, err = stmt.Exec(id)
+	// checkErr(err)
+
+	// affect, err = res.RowsAffected()
+	// checkErr(err)
+
+	fmt.Println(affect)
+
 	defer stmt.Close() //关闭之
 }
 
@@ -263,5 +275,18 @@ func main() {
 	initDb()
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8081
-	r.Run(":8081")
+	// r.Run(":8081")
+
+	// 方法2
+	// http.ListenAndServe(":8081", r)
+
+	// 方法3
+	s := &http.Server{
+		Addr:           ":8081",
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	s.ListenAndServe()
 }
