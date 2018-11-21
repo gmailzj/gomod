@@ -15,15 +15,20 @@ import "utils/uuid"
 
 var dbMap = make(map[string]string)
 
+var db *sql.DB
+
 func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 func initDb() {
-
-	db, err := sql.Open("sqlite3", "./db.db")
+	var err error
+	db, err = sql.Open("sqlite3", "./db.db")
 	checkErr(err)
+
+	db.SetMaxIdleConns(20)
+	db.SetMaxOpenConns(20)
 	// //插入数据
 	// stmt, err := db.Prepare("INSERT INTO userinfo(username, department, created) values(?,?,?)")
 	// checkErr(err)
@@ -33,39 +38,43 @@ func initDb() {
 
 	// id, err := res.LastInsertId()
 	// checkErr(err)
-	id := int64(2)
-	fmt.Println(id)
-	//更新数据
-	stmt, err := db.Prepare("update userinfo set username=? where uid=?")
-	checkErr(err)
+	// id := int64(2)
+	// fmt.Println(id)
+	// //更新数据
+	// stmt, err := db.Prepare("update userinfo set username=? where uid=?")
+	// checkErr(err)
 
-	res, err := stmt.Exec("astaxieupdate", id)
-	checkErr(err)
+	// res, err := stmt.Exec("astaxieupdate", id)
+	// checkErr(err)
 
-	affect, err := res.RowsAffected()
-	checkErr(err)
+	// affect, err := res.RowsAffected()
+	// checkErr(err)
 
-	fmt.Println(affect)
+	// fmt.Println(affect)
 
 	//查询数据
-	rows, err := db.Query("SELECT * FROM userinfo")
-	checkErr(err)
+	// rows, err := db.Query("SELECT * FROM userinfo")
+	// checkErr(err)
 
-	for rows.Next() {
-		var uid int
-		var username string
-		var department string
-		var created time.Time
-		err = rows.Scan(&uid, &username, &department, &created)
-		checkErr(err)
-		fmt.Println(uid)
-		fmt.Println(username)
-		fmt.Println(department)
-		fmt.Println(created)
-	}
+	// for rows.Next() {
+	// 	var uid int
+	// 	var username string
+	// 	var department string
+	// 	var created time.Time
+	// 	err = rows.Scan(&uid, &username, &department, &created)
+	// 	checkErr(err)
+	// 	fmt.Print(gin.H{
+	// 		"uid":        uid,
+	// 		"username":   username,
+	// 		"department": department,
+	// 		"created":    created,
+	// 	})
+	// }
+
 	//删除数据
 	// stmt, err = db.Prepare("delete from userinfo where uid=?")
 	// checkErr(err)
+	// defer stmt.Close() //关闭之
 
 	// res, err = stmt.Exec(id)
 	// checkErr(err)
@@ -73,9 +82,8 @@ func initDb() {
 	// affect, err = res.RowsAffected()
 	// checkErr(err)
 
-	fmt.Println(affect)
+	// fmt.Println(affect)
 
-	defer stmt.Close() //关闭之
 }
 
 func setupRouter() *gin.Engine {
@@ -153,7 +161,26 @@ func setupRouter() *gin.Engine {
 	v1 := router.Group("/v1")
 	{
 		v1.GET("/user", func(c *gin.Context) {
-			c.String(http.StatusOK, "user-v1")
+			//查询数据
+			rows, err := db.Query("SELECT * FROM userinfo")
+			checkErr(err)
+
+			list := []gin.H{}
+			for rows.Next() {
+				var uid int
+				var username string
+				var department string
+				var created time.Time
+				err = rows.Scan(&uid, &username, &department, &created)
+				checkErr(err)
+				list = append(list, gin.H{
+					"uid":        uid,
+					"username":   username,
+					"department": department,
+					"created":    created,
+				})
+			}
+			c.JSON(http.StatusOK, list)
 		})
 		v1.GET("/list", func(c *gin.Context) {
 			c.String(http.StatusOK, "list-v1")
@@ -272,6 +299,15 @@ func Logger() gin.HandlerFunc {
 }
 
 func main() {
+
+	// H is a shortcut for map[string]interface{}
+	// type H map[string]interface{}
+
+	// Running in "debug" mode. Switch to "release" mode in production.
+	// - using env:	export GIN_MODE=release
+	// - using code:	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
+
 	initDb()
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8081
