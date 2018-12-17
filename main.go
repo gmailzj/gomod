@@ -12,6 +12,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 import "utils/uuid"
+import "utils/demo"
 
 var dbMap = make(map[string]string)
 
@@ -93,6 +94,7 @@ func setupRouter() *gin.Engine {
 	router.Use(Logger())
 
 	router.GET("/", func(c *gin.Context) {
+		demo.Get()
 		c.String(http.StatusOK, "Hello World")
 	})
 
