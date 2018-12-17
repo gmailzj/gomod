@@ -20,7 +20,7 @@ func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	router := gin.Default()
-	router.Use(Logger())
+	//router.Use(Logger())
 
 
 	// 前台路由
