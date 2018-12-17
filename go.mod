@@ -1,15 +1,19 @@
 module gomod
 
+replace utils v0.0.0 => ./utils
+
 replace utils/demo v0.0.0 => ./utils/demo
 
 replace utils/uuid v0.0.0 => ./utils/uuid
 
+replace controller => ./controller
+
 require (
+	controller v0.0.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
 	github.com/gin-gonic/gin v1.3.0
 	github.com/golang/protobuf v1.2.0 // indirect
-	github.com/google/uuid v1.0.0
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0
@@ -24,6 +28,6 @@ require (
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/yaml.v2 v2.2.1 // indirect
-	utils/demo v0.0.0
+	utils v0.0.0
 	utils/uuid v0.0.0
 )
