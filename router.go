@@ -13,13 +13,15 @@ import (
 )
 
 func init(){
-	fmt.Println("loaded router")
+	fmt.Println("router init")
 }
 
 func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	router := gin.Default()
+
+	// 使用中间件
 	//router.Use(Logger())
 
 
@@ -30,22 +32,11 @@ func SetupRouter() *gin.Engine {
 		c.String(http.StatusOK, utils.GetEmptyString()+"index:"+uid.String())
 	})
 
+	// 首页
 	router.GET("/", controller.Index)
 
 
-	//router.GET("/uuid", func(c *gin.Context) {
-	//	// get a UUID instance
-	//	uuidMy := guuid.New()
-	//	str := uuidMy.String()
-	//
-	//	_ = uuid.NewV4()
-	//	demo.Get()
-	//	c.String(http.StatusOK, str)
-	//})
-
-
 	// 管理员路由
-
 	// Authorized group (uses gin.BasicAuth() middleware)
 	authorized := router.Group("/admin", gin.BasicAuth(gin.Accounts{
 		"foo":  "bar", // user:foo password:bar
@@ -59,14 +50,7 @@ func SetupRouter() *gin.Engine {
 		var json struct {
 			Value string `json:"value" binding:"required"`
 		}
-		/*
-			curl -X "POST" "http://127.0.0.1:8080/admin" \
-					-H 'Content-Type: application/json; charset=utf-8' \
-					-u 'foo:bar' \
-					-d $'{
-					"value": "1"
-			}'
-		*/
+
 		if ok := c.Bind(&json); ok == nil {
 			dbMap[user] = json.Value
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})

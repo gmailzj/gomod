@@ -159,8 +159,26 @@ package main
 		c.JSON(http.StatusOK, msg)
 	})
 
+	router.GET("/uuid", func(c *gin.Context) {
+		// get a UUID instance
+		uuidMy := guuid.New()
+		str := uuidMy.String()
+
+		_ = uuid.NewV4()
+		demo.Get()
+		c.String(http.StatusOK, str)
+	})
+
 	router.GET("/xml", func(c *gin.Context) {
 		data := []int{1, 2, 3}
 		c.XML(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
 	})
  */
+/*
+   curl -X "POST" "http://127.0.0.1:8080/admin" \
+		   -H 'Content-Type: application/json; charset=utf-8' \
+		   -u 'foo:bar' \
+		   -d $'{
+		   "value": "1"
+   }'
+*/
