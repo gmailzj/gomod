@@ -1,3 +1,4 @@
+{{ define "website/index.tmpl" }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,9 @@
   <title>Document</title>
 </head>
 <body>
-  index.html in templates
+  <p>index.tmpl in templates/website </p>
+  {{ .title }}
 </body>
 </html>
+
+{{ end }}

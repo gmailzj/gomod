@@ -8,18 +8,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-
-	_ "github.com/mattn/go-sqlite3"
+	// _ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 
-var dbMap = make(map[string]string)
+//var dbMap = make(map[string]string)
 
 var db *sql.DB
 
 func checkErr(err error) {
 	if err != nil {
 		panic(err)
+		// log.Fatal(err)
 	}
 }
 func main() {
@@ -50,11 +51,14 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	s.ListenAndServe()
+
+	defer db.Close()
 }
 
 func initDb() {
 	var err error
-	db, err = sql.Open("sqlite3", "./db.db")
+	//db, err = sql.Open("sqlite3", "./db.db")
+	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/goBlog?parseTime=true")
 	checkErr(err)
 
 	db.SetMaxIdleConns(20)

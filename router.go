@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	//_ "net/http/pprof"
 )
 import "utils"
 import "utils/uuid"
@@ -24,12 +25,20 @@ func SetupRouter() *gin.Engine {
 	// 使用中间件
 	//router.Use(Logger())
 
-
+	//router.LoadHTMLGlob("templates/*")
+	router.LoadHTMLGlob("templates/**/*")
 	// 前台路由
 	// Ping test
 	router.GET("/ping", func(c *gin.Context) {
 		uid := uuid.NewV4()
 		c.String(http.StatusOK, utils.GetEmptyString()+"index:"+uid.String())
+	})
+
+	 router.GET("/index", func(c *gin.Context) {
+		//根据完整文件名渲染模板，并传递参数
+		c.HTML(http.StatusOK, "website/index.tmpl", gin.H{
+			"title": "Hello,world",
+		})
 	})
 
 	// 首页
@@ -52,8 +61,7 @@ func SetupRouter() *gin.Engine {
 		}
 
 		if ok := c.Bind(&json); ok == nil {
-			dbMap[user] = json.Value
-			c.JSON(http.StatusOK, gin.H{"status": "ok"})
+			c.JSON(http.StatusOK, gin.H{"status": user+json.Value})
 		} else {
 			log.Println(ok)
 		}
