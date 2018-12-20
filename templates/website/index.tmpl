@@ -10,6 +10,18 @@
 <body>
   <p>index.tmpl in templates/website </p>
   {{ .title }}
+
+  <ul>
+    {{ range .list }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+
+  <ul>
+    {{ range .values }}
+    <li>{{ .I }} -> {{ .J }}</li>
+    {{ end }}
+  </ul>
 </body>
 </html>
 

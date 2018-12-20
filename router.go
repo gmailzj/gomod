@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 	//_ "net/http/pprof"
 )
 import "utils"
@@ -13,8 +14,14 @@ import (
 	"controller"
 )
 
-func init(){
+func init() {
 	fmt.Println("router init")
+}
+
+// GO语言中要提供给外面访问的方法或是结构体必须是首字母大写, 在模板中遍历的时候，field字段也要首字母大写
+type Foo struct {
+	I int
+	J string
 }
 
 func SetupRouter() *gin.Engine {
@@ -34,16 +41,23 @@ func SetupRouter() *gin.Engine {
 		c.String(http.StatusOK, utils.GetEmptyString()+"index:"+uid.String())
 	})
 
-	 router.GET("/index", func(c *gin.Context) {
+	router.GET("/index", func(c *gin.Context) {
+
+		arr := []int{1, 2, 3, 4, 5}
+		var values []Foo
+		for i := 0; i < 5; i++ {
+			values = append(values, Foo{I: i, J: "value " + strconv.Itoa(i)})
+		}
 		//根据完整文件名渲染模板，并传递参数
 		c.HTML(http.StatusOK, "website/index.tmpl", gin.H{
-			"title": "Hello,world",
+			"title":  "Hello,world",
+			"list":   arr,
+			"values": values,
 		})
 	})
 
 	// 首页
 	router.GET("/", controller.Index)
-
 
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)
@@ -61,7 +75,7 @@ func SetupRouter() *gin.Engine {
 		}
 
 		if ok := c.Bind(&json); ok == nil {
-			c.JSON(http.StatusOK, gin.H{"status": user+json.Value})
+			c.JSON(http.StatusOK, gin.H{"status": user + json.Value})
 		} else {
 			log.Println(ok)
 		}
@@ -83,9 +97,6 @@ func SetupRouter() *gin.Engine {
 	//		"title": "Posts",
 	//	})
 	//})
-
-
-
 
 	// 设置静态文件目录
 	router.Static("/assets", "./assets")
