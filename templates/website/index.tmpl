@@ -10,9 +10,8 @@
 <body>
   <p>index.tmpl in templates/website </p>
   {{ .title }}
-
   <ul>
-    {{ range .list }}
+    {{ range .valuesArr }}
     <li>{{ . }}</li>
     {{ end }}
   </ul>
@@ -22,6 +21,29 @@
     <li>{{ .I }} -> {{ .J }}</li>
     {{ end }}
   </ul>
+
+  <ul>
+    {{ range .valuesMap }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+
+  <ul>
+  {{ range $key, $value := .valuesMap }}
+    <li>{{ $key }} -> {{ $value }}</li>
+  {{ end }}
+  </ul>
+
+  <ul>
+    <li>Language: {{ .valuesMap.language }}</li>
+    <li>Version: {{ .valuesMap.version }}</li>
+  </ul>
+
+    <div>
+    The custom variables need to be prefixed with $.
+    </div>
+    {{ $address := "123 Main St." }}
+    {{ $address }}
 </body>
 </html>
 

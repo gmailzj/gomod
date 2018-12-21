@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,28 +12,25 @@ import (
 )
 
 
-//var dbMap = make(map[string]string)
-
-var db *sql.DB
-
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-		// log.Fatal(err)
-	}
-}
 func main() {
 
 	// H is a shortcut for map[string]interface{}
 	// type H map[string]interface{}
 
+	// gin 1.3以上新加了这个功能
+	// 如果要以指的格式（例如JSON，Key Values或其他格式）记录信息，则可以使用gin.DebugPrintRouteFunc指定格式。
+	// 在下面的示例中，我们使用标准日志包记录所有路由，但您可以使用其他满足需求的日志工具。
+
+	//gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+	//	log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
+	//}
+
 	// Running in "debug" mode. Switch to "release" mode in production.
 	// - using env:	export GIN_MODE=release
 	// - using code:	gin.SetMode(gin.ReleaseMode)
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	fmt.Println("server start ...")
 
-	initDb()
 	r := SetupRouter()
 	// Listen and Server in 0.0.0.0:8081
 	// r.Run(":8081")
@@ -52,21 +48,7 @@ func main() {
 	}
 	s.ListenAndServe()
 
-	defer db.Close()
 }
-
-func initDb() {
-	var err error
-	//db, err = sql.Open("sqlite3", "./db.db")
-	db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/goBlog?parseTime=true")
-	checkErr(err)
-
-	db.SetMaxIdleConns(20)
-	db.SetMaxOpenConns(20)
-
-
-}
-
 
 
 // Logger 中间件定义

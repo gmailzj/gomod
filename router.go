@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -32,6 +33,8 @@ func SetupRouter() *gin.Engine {
 	// 使用中间件
 	//router.Use(Logger())
 
+
+
 	//router.LoadHTMLGlob("templates/*")
 	router.LoadHTMLGlob("templates/**/*")
 	// 前台路由
@@ -43,21 +46,53 @@ func SetupRouter() *gin.Engine {
 
 	router.GET("/index", func(c *gin.Context) {
 
-		arr := []int{1, 2, 3, 4, 5}
+		valuesArr := []int{1, 2, 3, 4, 5}
 		var values []Foo
 		for i := 0; i < 5; i++ {
 			values = append(values, Foo{I: i, J: "value " + strconv.Itoa(i)})
 		}
+
+		valuesMap := make(map[string]string)
+		valuesMap["language"] = "Go"
+		valuesMap["version"] = "1.7.4"
+
 		//根据完整文件名渲染模板，并传递参数
 		c.HTML(http.StatusOK, "website/index.tmpl", gin.H{
 			"title":  "Hello,world",
-			"list":   arr,
+			"valuesArr":   valuesArr,
 			"values": values,
+			"valuesMap": valuesMap,
+		})
+	})
+
+	router.GET("/debug", func(c *gin.Context){
+
+		// Context对象中常用的属性
+
+		// Request *http.Request
+		// Writer  ResponseWriter
+		// Params Params
+
+		//log.Print("handle log")
+		body,_ := ioutil.ReadAll(c.Request.Body)
+		fmt.Println("---body/--- \r\n "+string(body))
+
+		fmt.Println("---header/--- \r\n")
+		for k,v :=range c.Request.Header {
+			fmt.Println(k,v)
+		}
+		//fmt.Println("header \r\n",c.Request.Header)
+
+		c.JSON(200,gin.H{
+			"receive":"1024",
 		})
 	})
 
 	// 首页
 	router.GET("/", controller.Index)
+
+	router.GET("/account/login", controller.AccountLogin)
+	router.POST("/account/login", controller.AccountLogin)
 
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)
