@@ -15,14 +15,14 @@ func AccountLogin(c *gin.Context) {
 		username := c.PostForm("username")
 		password := c.PostForm("password")
 		if username != "" && password != "" {
-			c.JSON(http.StatusOK,gin.H{
+			c.JSON(http.StatusOK, gin.H{
 				"code": 0,
 			})
 		}
 
 	} else {
 		c.HTML(http.StatusOK, "account/login.tmpl", gin.H{
-			"title":  "Hello,world",
+			"title": "Hello,world",
 		})
 	}
 

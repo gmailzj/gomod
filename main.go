@@ -2,15 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	// _ "github.com/mattn/go-sqlite3"
-	_ "github.com/go-sql-driver/mysql"
 )
-
 
 func main() {
 
@@ -50,7 +46,6 @@ func main() {
 
 }
 
-
 // Logger 中间件定义
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -72,5 +67,3 @@ func Logger() gin.HandlerFunc {
 		// log.Println(status)
 	}
 }
-
-

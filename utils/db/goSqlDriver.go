@@ -1,6 +1,9 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+)
 
 //var dbMap = make(map[string]string)
 var db *sql.DB
@@ -26,6 +29,6 @@ func initDb() {
 	db.SetMaxIdleConns(20)
 	db.SetMaxOpenConns(20)
 
-	defer db.Close()
+	//defer db.Close()
 
 }
