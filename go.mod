@@ -1,5 +1,7 @@
 module gomod
 
+replace models v0.0.0 => ./models
+
 replace utils v0.0.0 => ./utils
 
 replace utils/db v0.0.0 => ./utils/db
@@ -23,6 +25,7 @@ require (
 	golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06 // indirect
 	google.golang.org/appengine v1.4.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	models v0.0.0
 	utils v0.0.0
 	utils/db v0.0.0 // indirect
 	utils/uuid v0.0.0

@@ -1,5 +1,7 @@
 module controller
 
+replace models v0.0.0 => ../models
+
 replace utils v0.0.0 => ../utils
 
 require (
@@ -10,5 +12,6 @@ require (
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
+	models v0.0.0
 	utils v0.0.0
 )

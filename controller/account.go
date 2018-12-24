@@ -1,16 +1,14 @@
 package controller
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
+	"github.com/gin-gonic/gin"
+	"models"
+	_ "models"
 	"net/http"
 	"utils"
-
-	"github.com/gin-gonic/gin"
-
+	"encoding/json"
 )
-
 
 // AccountLogin 用户登录
 func AccountLogin(c *gin.Context) {
@@ -23,35 +21,14 @@ func AccountLogin(c *gin.Context) {
 		password := c.PostForm("password")
 		if username != "" && password != "" {
 
-			stmt, err := Db.Prepare("SELECT * FROM account WHERE username=? AND status = '1'")
-			CheckErr(err)
-
-			rows, err := stmt.Query(username)
-			CheckErr(err)
-
-			cloumns, err := rows.Columns()
-
-			values := make([]sql.RawBytes, len(cloumns))
-			scanArgs := make([]interface{}, len(values))
-			for i := range values {
-				scanArgs[i] = &values[i]
+			var account []models.Account
+			err := Db.Select(&account, "select * from account where username=?", username)
+			if err != nil {
+				fmt.Println("exec failed, ", err)
+				return
 			}
-			for rows.Next() {
-				err = rows.Scan(scanArgs...)
-				if err != nil {
-					log.Fatal(err)
-				}
-				var value string
-				for i, col := range values {
-					if col == nil {
-						value = "NULL"
-					} else {
-						value = string(col)
-					}
-					fmt.Println(cloumns[i], ": ", value)
-				}
-				fmt.Println("------------------")
-			}
+
+			fmt.Println("select succ:", account)
 
 			//for rows.Next() {
 			//	var password string
@@ -62,10 +39,12 @@ func AccountLogin(c *gin.Context) {
 			//	fmt.Println(password)
 			//	fmt.Println(salt)
 			//}
-
+			var jsonStr []byte;
+			jsonStr, _ = json.Marshal(account);
 			c.JSON(http.StatusOK, gin.H{
 				"code": 0,
 				"msg":  utils.MD5(password),
+				"data": (jsonStr),
 			})
 		}
 

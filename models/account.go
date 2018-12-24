@@ -2,11 +2,11 @@ package models
 
 
 type Account struct {
-	id   int    `db:"id"`
-	username string `db:"username"`
-	password string `db:"password"`
-	salt     string `db:"salt"`
-	status    string `db:"status"`
-	createdAt int `db:"createdAt"`
-	updatedAt int `db:"updatedAt"`
+	Id   int    `db:"id", json:"id"`
+	Username string `db:"username", json:"username"`
+	Password string `db:"password", json:"password"`
+	Salt     string `db:"salt", json:"salt"`
+	Status    string `db:"status", json:"status"`
+	CreatedAt int `db:"createdAt", json:"createdAt"`
+	UpdatedAt int `db:"updatedAt", json:"updatedAt"`
 }
