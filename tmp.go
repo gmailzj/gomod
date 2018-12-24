@@ -173,7 +173,14 @@ package main
 		data := []int{1, 2, 3}
 		c.XML(http.StatusOK, gin.H{"errCode": 0, "msg": "abc", "data": data})
 	})
- */
+
+	router.GET("/user/:name/*action", func(c *gin.Context) {
+		name := c.Param("name")
+		action := c.Param("action")
+		message := name + " is " + action
+		c.String(http.StatusOK, message)
+	})
+*/
 /*
    curl -X "POST" "http://127.0.0.1:8080/admin" \
 		   -H 'Content-Type: application/json; charset=utf-8' \
