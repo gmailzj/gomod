@@ -3,6 +3,7 @@ module controller
 replace models v0.0.0 => ../models
 
 replace utils v0.0.0 => ../utils
+
 replace utils/db v0.0.0 => ../utils/db
 
 require (
@@ -17,5 +18,4 @@ require (
 	models v0.0.0
 	utils v0.0.0
 	utils/db v0.0.0
-)
 )
