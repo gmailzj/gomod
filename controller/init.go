@@ -2,7 +2,9 @@ package controller
 
 import (
 	//"database/sql"
+
 	"utils/db"
+
 	"github.com/jmoiron/sqlx"
 )
 

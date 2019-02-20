@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"models"
-	_ "models"
 	"net/http"
 	"utils"
-	"encoding/json"
+
+	"github.com/gin-gonic/gin"
 )
 
 // AccountLogin 用户登录
@@ -39,17 +39,22 @@ func AccountLogin(c *gin.Context) {
 			//	fmt.Println(password)
 			//	fmt.Println(salt)
 			//}
-			var jsonStr []byte;
-			jsonStr, _ = json.Marshal(account);
+
+			var jsonStr []byte
+			var jsonData interface{}
+			jsonStr, err = json.Marshal(account)
+			if err != nil {
+				json.Unmarshal(jsonStr, jsonData)
+			}
 			c.JSON(http.StatusOK, gin.H{
 				"code": 0,
 				"msg":  utils.MD5(password),
-				"data": (jsonStr),
+				"data": account,
 			})
 		}
 
 	} else {
-		c.HTML(http.StatusOK, "account/login.tmpl", gin.H{
+		c.HTML(http.StatusOK, "admin/login.tmpl", gin.H{
 			"title": "Hello,world",
 		})
 	}

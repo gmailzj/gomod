@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
+	"text/template"
 	"github.com/gin-gonic/gin"
 	//_ "net/http/pprof"
 )
@@ -21,12 +21,16 @@ func init() {
 	fmt.Println("router init")
 }
 
-// GO语言中要提供给外面访问的方法或是结构体必须是首字母大写, 在模板中遍历的时候，field字段也要首字母大写
+// Foo GO语言中要提供给外面访问的方法或是结构体必须是首字母大写, 在模板中遍历的时候，field字段也要首字母大写
 type Foo struct {
 	I int
 	J string
 }
 
+var Tmpl   *template.Template
+
+
+// SetupRouter func
 func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
@@ -35,8 +39,9 @@ func SetupRouter() *gin.Engine {
 	// 使用中间件
 	//router.Use(Logger())
 
-	//router.LoadHTMLGlob("templates/*")
+	// router.LoadHTMLGlob("templates/*")
 	router.LoadHTMLGlob("templates/**/*")
+
 	// 前台路由
 	// Ping test
 	router.GET("/ping", func(c *gin.Context) {
@@ -90,22 +95,23 @@ func SetupRouter() *gin.Engine {
 	// 首页
 	router.GET("/", controller.Index)
 
-	router.GET("/account/login", controller.AccountLogin)
-	router.POST("/account/login", controller.AccountLogin)
-
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)
-	authorized := router.Group("/admin", gin.BasicAuth(gin.Accounts{
+	admin := router.Group("/admin", gin.BasicAuth(gin.Accounts{
 		"foo":  "bar", // user:foo password:bar
 		"manu": "123", // user:manu password:123
 	}))
 
-	authorized.POST("/", func(c *gin.Context) {
+	admin.GET("/login", controller.AccountLogin)
+	admin.POST("/login", controller.AccountLogin)
+
+	admin.GET("/", func(c *gin.Context) {
 		user := c.MustGet(gin.AuthUserKey).(string)
 
 		// Parse JSON
 		var json struct {
-			Value string `json:"value" binding:"required"`
+			// Value string `json:"value" binding:"required"`
+			Value string `json:"value"`
 		}
 
 		if ok := c.Bind(&json); ok == nil {
