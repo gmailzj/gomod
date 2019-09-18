@@ -3,9 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"models"
+	"gomod/models"
 	"net/http"
-	"utils"
+	"gomod/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,8 +44,8 @@ func AccountLogin(c *gin.Context) {
 			// jsonStr, err = json.Marshal(account)
 			jsonStr, err = json.Marshal(struct {
 				*models.Account
-				Salt   string `db:"salt" json:"salt"`
-				Status string `db:"status" json:"-"`
+				// Salt   string `db:"salt" json:"salt"`
+				// Status string `db:"status" json:"-"`
 			}{
 				Account: &account,
 			})

@@ -9,12 +9,10 @@ import (
 	"text/template"
 	"github.com/gin-gonic/gin"
 	//_ "net/http/pprof"
-)
+	"gomod/utils"
+	"gomod/utils/uuid"
+	"gomod/controller"
 
-import "utils"
-import "utils/uuid"
-import (
-	"controller"
 )
 
 func init() {

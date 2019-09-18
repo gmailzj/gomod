@@ -3,7 +3,7 @@ package controller
 import (
 	//"database/sql"
 
-	"utils/db"
+	"gomod/utils/db"
 
 	"github.com/jmoiron/sqlx"
 )
