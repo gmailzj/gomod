@@ -3,12 +3,25 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"github.com/davecgh/go-spew/spew"
 	"net/http"
+	"os"
 	"time"
 )
 
+func init(){
+	// 设置日志格式为json格式
+	log.SetFormatter(&log.JSONFormatter{})
+	// 设置将日志输出到标准输出（默认的输出为stderr，标准错误）
+	// 日志消息输出可以是任意的io.writer类型
+	log.SetOutput(os.Stdout)
+	// 设置日志级别为warn以上
+	//log.SetLevel(log.InfoLevel)
+}
+
 func main() {
+	log.Info("begin:main")
 
 	// H is a shortcut for map[string]interface{}
 	// type H map[string]interface{}
@@ -25,9 +38,11 @@ func main() {
 	// - using env:	export GIN_MODE=release
 	// - using code:	gin.SetMode(gin.ReleaseMode)
 	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	fmt.Println("server start ...")
 
 	r := SetupRouter()
+	//r.Use(Logger())
 	// Listen and Server in 0.0.0.0:8081
 	// r.Run(":8081")
 
@@ -51,6 +66,8 @@ func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
 
+		spew.Dump(t);
+
 		// 在gin上下文中定义变量
 		c.Set("example", "12345")
 
@@ -60,7 +77,8 @@ func Logger() gin.HandlerFunc {
 
 		// 请求后
 		latency := time.Since(t)
-		log.Print(latency)
+		log.Info(latency)
+
 
 		// access the status we are sending
 		// status := c.Writer.Status()

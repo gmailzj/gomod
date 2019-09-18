@@ -35,7 +35,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	// 使用中间件
-	//router.Use(Logger())
+	router.Use(Logger())
 
 	// router.LoadHTMLGlob("templates/*")
 	router.LoadHTMLGlob("templates/**/*")
