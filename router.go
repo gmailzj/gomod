@@ -2,17 +2,16 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"text/template"
-	"github.com/gin-gonic/gin"
 	//_ "net/http/pprof"
+	"gomod/controller"
 	"gomod/utils"
 	"gomod/utils/uuid"
-	"gomod/controller"
-
 )
 
 func init() {
@@ -25,8 +24,7 @@ type Foo struct {
 	J string
 }
 
-var Tmpl   *template.Template
-
+var Tmpl *template.Template
 
 // SetupRouter func
 func SetupRouter() *gin.Engine {
@@ -68,7 +66,7 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	router.GET("/debug", func(c *gin.Context) {
+	router.POST("/debug", func(c *gin.Context) {
 
 		// Context对象中常用的属性
 
@@ -93,6 +91,13 @@ func SetupRouter() *gin.Engine {
 	// 首页
 	router.GET("/", controller.Index)
 
+	test := router.Group("/test")
+	test.GET("yaml", func(c *gin.Context) {
+		c.YAML(http.StatusOK, gin.H{"message": "hey"})
+	})
+	test.GET("json", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "hey"})
+	})
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)
 	admin := router.Group("/admin", gin.BasicAuth(gin.Accounts{
@@ -112,10 +117,10 @@ func SetupRouter() *gin.Engine {
 			Value string `json:"value"`
 		}
 
-		if ok := c.Bind(&json); ok == nil {
+		if err := c.Bind(&json); err == nil {
 			c.JSON(http.StatusOK, gin.H{"status": user + json.Value})
 		} else {
-			log.Println(ok)
+			log.Println(err)
 		}
 	})
 
