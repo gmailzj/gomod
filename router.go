@@ -10,6 +10,7 @@ import (
 	"text/template"
 	//_ "net/http/pprof"
 	"gomod/controller"
+	"gomod/controller/api"
 	"gomod/utils"
 	"gomod/utils/uuid"
 )
@@ -98,6 +99,10 @@ func SetupRouter() *gin.Engine {
 	test.GET("json", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hey"})
 	})
+
+	apiGroup := router.Group("/api")
+	apiGroup.POST("/login", api.AccountLogin)
+
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)
 	admin := router.Group("/admin", gin.BasicAuth(gin.Accounts{
