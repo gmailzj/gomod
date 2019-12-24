@@ -5,6 +5,7 @@ import (
 	"gomod/controller/api/params"
 	"gomod/models"
 	"gomod/utils"
+	"gomod/utils/logger"
 	"log"
 	"net/http"
 	"strconv"
@@ -23,8 +24,17 @@ type LoginResult struct {
 
 // AccountLogin 用户登录
 func AccountLogin(c *gin.Context) {
+	logId := c.GetString(utils.LogIdParam)
 	//ctx := make(map[string]interface{})
 	//c.String(http.StatusOK, strings.ToUpper("index"))
+
+	// c.Set("response", gin.H{
+	// 	"code": 1,
+	// 	"msg":  "参数错误",
+	// 	"data": "",
+	// })
+	// return
+	logger.Info(logId, "xxx")
 	if c.Request.Method == "POST" {
 		var p params.LoginParamsJson
 		if c.ShouldBind(&p) != nil {
@@ -58,11 +68,6 @@ func AccountLogin(c *gin.Context) {
 			// 生成token
 			generateToken(c, account)
 			return
-			c.JSON(http.StatusOK, gin.H{
-				"code": 0,
-				"msg":  utils.MD5(password),
-				"data": account,
-			})
 		}
 
 	}

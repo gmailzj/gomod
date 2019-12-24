@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gomod/middleware"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"text/template"
-	//_ "net/http/pprof"
+	"time"
+
+	// _ "net/http/pprof"
 	"gomod/controller"
 	"gomod/controller/api"
 	"gomod/utils"
@@ -31,10 +34,29 @@ var Tmpl *template.Template
 func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
+
+	// gin.Default 默认使用了两个中间件 engine.Use(Logger(), Recovery())
 	router := gin.Default()
 
+	router.NoMethod(func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"code":    http.StatusMethodNotAllowed,
+			"message": "请求方式不允许",
+			"data":    map[string]string{},
+		})
+	})
+
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"code":    http.StatusNotFound,
+			"message": "接口不存在",
+			"data":    map[string]string{},
+		})
+	})
+
 	// 使用中间件
-	router.Use(Logger())
+	// router.Use(Logger())
+	// router.Use(middleware.Recovery())
 
 	// router.LoadHTMLGlob("templates/*")
 	router.LoadHTMLGlob("templates/**/*")
@@ -100,7 +122,15 @@ func SetupRouter() *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"message": "hey"})
 	})
 
+	// API 接口
 	apiGroup := router.Group("/api")
+	apiGroup.Use(middleware.Response)
+	apiGroup.Any("/", func(c *gin.Context) {
+		c.Header("server", "lake/1.0.0")
+		c.JSON(200, gin.H{
+			"message": "lake service " + time.Now().Format("2006-01-02 15:04:05"),
+		})
+	})
 	apiGroup.POST("/login", api.AccountLogin)
 
 	// 管理员路由
