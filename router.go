@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gomod/middleware"
+	"gomod/middleware/jwt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -125,6 +126,8 @@ func SetupRouter() *gin.Engine {
 	// API 接口
 	apiGroup := router.Group("/api")
 	apiGroup.Use(middleware.Response)
+	apiGroup.Use(jwt.JWTAuth())
+
 	apiGroup.Any("/", func(c *gin.Context) {
 		c.Header("server", "lake/1.0.0")
 		c.JSON(200, gin.H{

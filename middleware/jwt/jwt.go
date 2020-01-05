@@ -2,22 +2,36 @@ package jwt
 
 import (
 	"errors"
+	"github.com/davecgh/go-spew/spew"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
+// 不需要登录
+var optional = map[string]int{
+	"login": 1,
+}
+
 // JWTAuth 中间件，检查token
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("token")
+		// 如果不需要登录  跳过
+		requestUri := c.Request.RequestURI
+		routeKey := strings.TrimLeft(requestUri, "/api")
+		if _, ok := optional[routeKey]; ok {
+			c.Next()
+			return
+		}
+		token := c.Query("token")
 		if token == "" {
 			c.JSON(http.StatusOK, gin.H{
-				"status": -1,
-				"msg":    "请求未携带token，无权限访问",
+				"code": 401,
+				"msg":  "请求未携带token，无权限访问",
 			})
 			c.Abort()
 			return
@@ -31,15 +45,15 @@ func JWTAuth() gin.HandlerFunc {
 		if err != nil {
 			if err == TokenExpired {
 				c.JSON(http.StatusOK, gin.H{
-					"status": -1,
-					"msg":    "授权已过期",
+					"code": 401,
+					"msg":  "授权已过期",
 				})
 				c.Abort()
 				return
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"status": -1,
-				"msg":    err.Error(),
+				"code": 401,
+				"msg":  err.Error(),
 			})
 			c.Abort()
 			return
@@ -56,11 +70,11 @@ type JWT struct {
 
 // 一些常量
 var (
-	TokenExpired     error  = errors.New("Token is expired")
-	TokenNotValidYet error  = errors.New("Token not active yet")
-	TokenMalformed   error  = errors.New("That's not even a token")
-	TokenInvalid     error  = errors.New("Couldn't handle this token:")
-	SignKey          string = "newtrekWang"
+	TokenExpired     error  = errors.New("Token 已过期")
+	TokenNotValidYet error  = errors.New("Token 错误")
+	TokenMalformed   error  = errors.New("Token 格式不正确")
+	TokenInvalid     error  = errors.New("Token 验证失败")
+	SignKey          string = "wonderful"
 )
 
 // 载荷，可以加一些自己需要的信息
@@ -99,6 +113,7 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
+	spew.Dump(tokenString, err)
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
