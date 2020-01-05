@@ -6,3 +6,4 @@ go.sum
 gin-bin
 /gomod
 /runtime/
+/vendor/
