@@ -132,6 +132,7 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 	apiGroup.POST("/login", api.AccountLogin)
+	apiGroup.GET("/user/info", api.UserInfo)
 
 	// 管理员路由
 	// Authorized group (uses gin.BasicAuth() middleware)

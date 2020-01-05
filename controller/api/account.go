@@ -37,10 +37,10 @@ func AccountLogin(c *gin.Context) {
 	logger.Info(logId, "xxx")
 	if c.Request.Method == "POST" {
 		var p params.LoginParamsJson
-		if c.ShouldBind(&p) != nil {
+		if err := c.ShouldBind(&p); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"code": 1,
-				"msg":  "参数错误",
+				"msg":  "参数错误:" + err.Error(),
 				"data": "",
 			})
 			return

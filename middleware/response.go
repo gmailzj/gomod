@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"gomod/data"
 	errorcode "gomod/errorcode"
 	"gomod/utils"
 	"gomod/utils/logger"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -15,7 +18,21 @@ import (
 func Response(c *gin.Context) {
 	logId := utils.Uniqid()
 	c.Set(utils.LogIdParam, logId)
-	logger.Info(logId, "收到请求", c.Request.RequestURI, c.Request.Method)
+
+	var requestData string = ""
+	if c.Request.Method == "POST" {
+		// body, err := ioutil.ReadAll(c.Request.Body)
+		body, err := c.GetRawData()
+		spew.Dump(body)
+		if err != nil {
+			logger.Error(logId, "收到请求参数错误", c.Request.RequestURI, c.Request.Method, err.Error())
+		}
+		requestData = string(body[:])
+		// Gin框架，body参数只能读取一次
+		// 在使用gin框架的时候，发现请求的body数据只允许读取一次
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body)) // 关键点
+	}
+	logger.Info(logId, "收到请求", c.Request.RequestURI, c.Request.Method, requestData)
 
 	c.Header("server", "golden/1.0.0")
 	c.Header("logid", logId)
@@ -25,7 +42,7 @@ func Response(c *gin.Context) {
 	c.Next()
 
 	if c.Writer.Written() {
-		logger.Info(logId, "响应请求-已响应过", c.Request.RequestURI, c.Request.Method)
+		logger.Info(logId, "响应请求", c.Request.RequestURI, c.Request.Method)
 		return
 	}
 

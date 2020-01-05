@@ -51,8 +51,14 @@ func SetLogLevel(l uint32) {
 func InitLogger() {
 	onceInit.Do(func() {
 		app := "log"
+		str, _ := os.Getwd()
 		if logPath == "" {
-			logPath = "/tmp/go/"
+			logPath = str + "/runtime/"
+			err := os.MkdirAll(logPath, os.ModePerm)
+			if err != nil {
+				panic("创建日志目录错误" + err.Error())
+				return
+			}
 		}
 		logFile := logPath + logName
 		var w io.Writer

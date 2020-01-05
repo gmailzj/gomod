@@ -5,3 +5,4 @@ go.sum
 .idea
 gin-bin
 /gomod
+/runtime/
