@@ -1,12 +1,12 @@
 package db
 
 import (
-	"github.com/jmoiron/sqlx"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	"gomod/config"
 	"log"
 	"time"
 )
-
 
 var (
 	Db *sqlx.DB
@@ -20,8 +20,8 @@ func init() {
 		var err error
 		//Db, err = sqlx.Connect(db_drivers, db_contection)
 
-
-		Db, err = sqlx.Connect("mysql", "root:@tcp(127.0.0.1:3306)/goBlog?parseTime=true")
+		dataSourceName, _ := config.Config.GetValue("mysql", "dsn")
+		Db, err = sqlx.Connect("mysql", dataSourceName)
 
 		if err != nil || Db == nil {
 			log.Fatalf("sqlx 初始化数据库出错：\n %#v", err)
@@ -32,4 +32,3 @@ func init() {
 		Db.SetConnMaxLifetime(20 * time.Second) //数据库最大生命周期
 	}
 }
-

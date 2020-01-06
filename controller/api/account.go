@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"gomod/controller/api/params"
+	"gomod/db"
 	"gomod/models"
 	"gomod/utils"
 	"gomod/utils/logger"
@@ -94,7 +95,7 @@ func generateToken(c *gin.Context, account models.Account) {
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": -1,
+			"status": 1,
 			"msg":    err.Error(),
 		})
 		return
@@ -102,15 +103,18 @@ func generateToken(c *gin.Context, account models.Account) {
 
 	log.Println(token)
 
+	redisClient := db.GetRedis().Get()
+	defer redisClient.Close()
+
 	data := LoginResult{
 		Uid:   account.Id,
 		Token: token,
 		Name:  account.Username,
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"status": 0,
-		"msg":    "登录成功！",
-		"data":   data,
+		"code": 0,
+		"msg":  "登录成功！",
+		"data": data,
 	})
 	return
 }

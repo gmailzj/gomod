@@ -21,3 +21,11 @@ mod是模块英文modules的简写。
 go.mod文件是文本文件，是可以自己手动编辑的。 
 Go模块版本控制的下载文件及信息会存储到GOPATH的pkg/mod文件夹里。 
 使用了Go模块，源码不一定要在GOPATH中进行。
+#string到int 
+int,err:=strconv.Atoi(string) 
+#string到int64 
+int64, err := strconv.ParseInt(string, 10, 64) 
+#int到string 
+string:=strconv.Itoa(int) 
+#int64到string 
+string:=strconv.FormatInt(int64,10)

@@ -47,6 +47,7 @@ func JWTAuth() gin.HandlerFunc {
 				c.JSON(http.StatusOK, gin.H{
 					"code": 401,
 					"msg":  "授权已过期",
+					"data": nil,
 				})
 				c.Abort()
 				return
@@ -54,6 +55,7 @@ func JWTAuth() gin.HandlerFunc {
 			c.JSON(http.StatusOK, gin.H{
 				"code": 401,
 				"msg":  err.Error(),
+				"data": nil,
 			})
 			c.Abort()
 			return
